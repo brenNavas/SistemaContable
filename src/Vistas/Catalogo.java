@@ -10,16 +10,31 @@ package Vistas;
  * @author Yeseliz
  */
 import Datos.Cuentas;
-import Logica.fCuentas;
+import Logica.Conexion;
+import Logica.CuentaTableModel;
+import Logica.MyTableCellEditor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 public class Catalogo extends javax.swing.JInternalFrame {
+public CuentaTableModel cuentaTModel = new CuentaTableModel();
+private Conexion mysql = new Conexion();
+private Connection cn = mysql.conectar();
+private String sentenciaSql = "";
+Cuentas cuentaActual;
+boolean guardar=true;
 
     /**
      * Creates new form Catalogo
@@ -28,18 +43,18 @@ public class Catalogo extends javax.swing.JInternalFrame {
         initComponents();
         setResizable(false); //no se maximice la pantalla
         setTitle("Catálogo de Cuentas"); //Título del Frame
-        mostrar("");
+        inicializarColumnas();
+        consultaInicial();
+         ocultarColumnas();
+       
+       
     }
 
-    void ocultarColumnas() { //ocultar las columnas que no quiero que se muestren
+     void ocultarColumnas() { //ocultar las columnas que no quiero que se muestren
         
         tablaCuentas.getColumnModel().getColumn(0).setMaxWidth(0);
         tablaCuentas.getColumnModel().getColumn(0).setMinWidth(0);
         tablaCuentas.getColumnModel().getColumn(0).setPreferredWidth(0);
-        
-        tablaCuentas.getColumnModel().getColumn(3).setMaxWidth(0);
-        tablaCuentas.getColumnModel().getColumn(3).setMinWidth(0);
-        tablaCuentas.getColumnModel().getColumn(3).setPreferredWidth(0);
         
         tablaCuentas.getColumnModel().getColumn(4).setMaxWidth(0);
         tablaCuentas.getColumnModel().getColumn(4).setMinWidth(0);
@@ -48,34 +63,66 @@ public class Catalogo extends javax.swing.JInternalFrame {
         tablaCuentas.getColumnModel().getColumn(5).setMaxWidth(0);
         tablaCuentas.getColumnModel().getColumn(5).setMinWidth(0);
         tablaCuentas.getColumnModel().getColumn(5).setPreferredWidth(0);
-        
-        tablaCuentas.getColumnModel().getColumn(6).setMaxWidth(0);
-        tablaCuentas.getColumnModel().getColumn(6).setMinWidth(0);
-        tablaCuentas.getColumnModel().getColumn(6).setPreferredWidth(0);
-        
-        tablaCuentas.getColumnModel().getColumn(7).setMaxWidth(0);
-        tablaCuentas.getColumnModel().getColumn(7).setMinWidth(0);
-        tablaCuentas.getColumnModel().getColumn(7).setPreferredWidth(0);
-    }
-
-    void mostrar(String buscar) { //mostrar datos en la tabla
-        try {
-            DefaultTableModel modelo;
-            fCuentas cta = new fCuentas();
-            modelo = cta.mostrar(buscar);
-
-            tablaCuentas.setModel(modelo);
-            ocultarColumnas();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e);
-        }
+  
     }
     
+
+  private void inicializarColumnas() {
+        TableColumnModel tColumnModel = new DefaultTableColumnModel();
+        for (int i = 0; i < 6; i++) {
+            TableColumn col = new TableColumn(i);
+            switch (i) {
+                case 0:
+                    col.setHeaderValue("Id");
+                    break;
+                case 1:
+                    col.setHeaderValue("Código");
+                    break;
+                case 2:
+                    col.setHeaderValue("Nombre");
+                    break;
+                case 3:
+                    col.setHeaderValue("Tipo");
+                    break;
+                case 4:
+                    col.setHeaderValue("Saldo Deudor");
+                    break;
+                case 5:
+                    col.setHeaderValue("Saldo Acreedor");
+            }
+            tColumnModel.addColumn(col);
+        }
+        tablaCuentas.setColumnModel(tColumnModel);
+    }
+  
+    private void consultaInicial() {
+        try {
+            sentenciaSql = "SELECT * FROM cuenta ORDER BY idCuenta asc";
+            Statement statement = this.cn.createStatement();
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+                Cuentas cuenta = new Cuentas();
+                //cuenta.idCuenta = resultado.getInt("idCuenta");
+                cuenta.codigoCuenta = resultado.getLong("codigoCuenta");
+                cuenta.nombreCuenta = resultado.getString("nombreCuenta");
+                cuenta.tipo = resultado.getString("tipo");
+                cuenta.saldoDeudor = resultado.getDouble("saldoDeudor");
+                cuenta.saldoAcreedor = resultado.getDouble("saldoAcreedor");             
+             this.cuentaTModel.cuentas.add(cuenta);
+            }
+            tablaCuentas.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar los cuentas de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+     
+     
       //método de filtro de datos
     private TableRowSorter tr;
     
     public void filtro(){
-        tr.setRowFilter(RowFilter.regexFilter(txtBuscar.getText(),0,1,2));
+        tr.setRowFilter(RowFilter.regexFilter(txtBuscar.getText(),1,2));
     }
     
     
@@ -105,23 +152,13 @@ public class Catalogo extends javax.swing.JInternalFrame {
         setIconifiable(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(0, 102, 102));
+        jPanel1.setBackground(new java.awt.Color(102, 0, 102));
 
-        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
         tablaCuentas.setBackground(new java.awt.Color(204, 204, 204));
-        tablaCuentas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+        tablaCuentas.setModel(cuentaTModel);
         jScrollPane1.setViewportView(tablaCuentas);
 
         txtBuscar.setBackground(new java.awt.Color(204, 204, 204));
@@ -136,7 +173,7 @@ public class Catalogo extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel3.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel3.setForeground(new java.awt.Color(102, 0, 102));
         jLabel3.setText("Digite el código o nombre de la cuenta que desea buscar:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -149,18 +186,18 @@ public class Catalogo extends javax.swing.JInternalFrame {
                     .addComponent(jLabel3)
                     .addComponent(txtBuscar)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(31, Short.MAX_VALUE)
+                .addGap(43, 43, 43)
                 .addComponent(jLabel3)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                .addGap(39, 39, 39)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(153, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -176,14 +213,14 @@ public class Catalogo extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 660, 320));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 650, 510));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 410));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 580));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

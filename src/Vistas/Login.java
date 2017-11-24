@@ -6,9 +6,14 @@
 package Vistas;
 
 import Datos.Trabajador;
-import Logica.fLogin;
-
-
+import Logica.Conexion;
+import Vistas.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -17,6 +22,9 @@ import javax.swing.table.DefaultTableModel;
  * @author Yeseliz
  */
 public class Login extends javax.swing.JFrame {
+    private Conexion mysql = new Conexion();
+    private Connection cn= mysql.conectar(); 
+    private String sentenciaSql = "";
 
     /**
      * Creates new form Trabajador
@@ -24,10 +32,62 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         setLocationRelativeTo(null);//pantalla centrada
-        setResizable(false); //no se maximice la pantalla
+       // setResizable(false); //no se maximice la pantalla
         setTitle("Sistema Contable"); //Título del Frame
     }
 
+    
+    void acceder(String usuario, String pass){
+        
+        String cap="";
+        String sql = "SELECT * FROM trabajador WHERE nombreUsuario ='" +usuario+"' && password ='"+pass+"'";
+        
+        
+        try{
+            Statement st = cn.createStatement();
+            ResultSet resultado = st.executeQuery(sql);
+            Cuenta c = new Cuenta();
+            
+            while(resultado.next()){
+                cap= resultado.getString("tipo_acceso");
+            }
+            if(cap.equals("Administrador")){
+             
+                JOptionPane.showMessageDialog(null, "BIENVENIDO " + usuario);
+               
+                CGeneral m = new CGeneral();
+                Cuenta cta = new Cuenta();
+           
+               // m.toFront();
+                m.setVisible(true);
+                m.pack();
+                m.nombre.setText("ADMINISTRADOR");
+                m.habilitarUsuario();
+               
+                
+               
+                
+
+            }
+            else if(cap.equals("Usuario")){
+               
+                JOptionPane.showMessageDialog(null, "BIENVENIDO " + usuario);
+                CGeneral m = new CGeneral();
+                Cuenta cta = new Cuenta();
+                m.setVisible(true);
+                m.pack();
+                m.nombre.setText("EMPLEADO");
+                
+               
+            }
+            else if((!cap.equals("Administrador"))&& (!cap.equals("Usuario"))){
+                JOptionPane.showMessageDialog(this, "SUS DATOS NO HAN SIDO INGRESADOS CORRECTAMENTE");
+            }
+        }catch(SQLException ex){
+            
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,44 +100,33 @@ public class Login extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        txtContraseña = new javax.swing.JTextField();
         txtUsuario = new javax.swing.JTextField();
         btnSalir = new javax.swing.JButton();
         btnIniciar = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        tablaListado = new javax.swing.JTable();
+        txtContraseña = new javax.swing.JPasswordField();
         jLabel5 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 51, 51));
+        setMinimumSize(new java.awt.Dimension(1265, 750));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("LOGIN");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 80, 70, 20));
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 170, 130, 30));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel1.setFont(new java.awt.Font("Britannic Bold", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Usuario:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 210, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 260, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel2.setFont(new java.awt.Font("Britannic Bold", 1, 18)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Contraseña:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 260, -1, -1));
-
-        txtContraseña.setBackground(new java.awt.Color(204, 204, 204));
-        txtContraseña.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtContraseñaActionPerformed(evt);
-            }
-        });
-        getContentPane().add(txtContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 260, 73, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 320, -1, -1));
 
         txtUsuario.setBackground(new java.awt.Color(204, 204, 204));
         txtUsuario.addActionListener(new java.awt.event.ActionListener() {
@@ -85,10 +134,10 @@ public class Login extends javax.swing.JFrame {
                 txtUsuarioActionPerformed(evt);
             }
         });
-        getContentPane().add(txtUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 210, 73, -1));
+        getContentPane().add(txtUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 260, 120, 30));
 
-        btnSalir.setBackground(new java.awt.Color(102, 102, 102));
-        btnSalir.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnSalir.setBackground(new java.awt.Color(153, 153, 153));
+        btnSalir.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnSalir.setForeground(new java.awt.Color(0, 102, 102));
         btnSalir.setText("Salir");
         btnSalir.addActionListener(new java.awt.event.ActionListener() {
@@ -96,10 +145,10 @@ public class Login extends javax.swing.JFrame {
                 btnSalirActionPerformed(evt);
             }
         });
-        getContentPane().add(btnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 360, 80, 40));
+        getContentPane().add(btnSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 430, 80, 30));
 
-        btnIniciar.setBackground(new java.awt.Color(102, 102, 102));
-        btnIniciar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnIniciar.setBackground(new java.awt.Color(153, 153, 153));
+        btnIniciar.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnIniciar.setForeground(new java.awt.Color(0, 102, 102));
         btnIniciar.setText("Iniciar Sesión");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
@@ -107,47 +156,27 @@ public class Login extends javax.swing.JFrame {
                 btnIniciarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnIniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 360, 120, 40));
+        getContentPane().add(btnIniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 430, 120, 30));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Login M1.png"))); // NOI18N
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 190, 100, 90));
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/loginIcono.png"))); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 160, 330, 260));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/LOGO1.png"))); // NOI18N
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 350, 130, 90));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 500, 320, 190));
 
-        tablaListado.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+        txtContraseña.setBackground(new java.awt.Color(204, 204, 204));
+        txtContraseña.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtContraseñaActionPerformed(evt);
             }
-        ));
-        getContentPane().add(tablaListado, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 260, 10, 10));
+        });
+        getContentPane().add(txtContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 310, 120, 30));
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -30, 910, 490));
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 340, 160, 100));
-
-        jMenuBar1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jMenuBar1.add(jMenu1);
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1270, 730));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContraseñaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtContraseñaActionPerformed
-
-    private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtUsuarioActionPerformed
 
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         // boton salir
@@ -155,39 +184,42 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSalirActionPerformed
 
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
-        Menu m = new Menu(); //instancia al Frame 
+       String usu= txtUsuario.getText();
+       String pass = txtContraseña.getText();
+
+        
+       acceder(usu, pass);
+        /*Menu m = new Menu(); //instancia al Frame 
         m.setVisible(true);
         this.dispose();
-        
-
-
-//botón iniciar sesión 
-        /*
-        
+*/
+/*
     try {
             DefaultTableModel modelo;
-            fLogin user =new fLogin();
+            fTrabajador user =new fTrabajador();
             Trabajador l=new Trabajador();
             
             l.setNombreUsuario(txtUsuario.getText());
             l.setContraseña(txtContraseña.getText());
+            
             modelo = user.login(l.getNombreUsuario(), l.getContraseña());
             tablaListado.setModel(modelo);
             
 
-            if (user.totalR >0) {
+            if (user.totalregistros >0) {
                 this.dispose();
                 
-                CGeneral menu2 = new CGeneral();
-                menu2.toFront();
-                menu2.setVisible(true);
+                CGeneral m = new CGeneral();
+                m.toFront();
+                m.setVisible(true);
                 
-                menu2.lblNombre.setText(tablaListado.getValueAt(0,0).toString());
-                menu2.lblCargo.setText(tablaListado.getValueAt(0,1).toString());
-                menu2.lblTipo.setText(tablaListado.getValueAt(0,2).toString());
                 
-                if(!menu2.lblTipo.getText().equals("Administrador")){
-                    menu2.menuConfig.setEnabled(false);
+                CGeneral.lblNombre.setText(tablaListado.getValueAt(0,0).toString());
+                CGeneral.lblCargo.setText(tablaListado.getValueAt(0,1).toString());
+                CGeneral.lblTipo.setText(tablaListado.getValueAt(0,2).toString());
+                
+                if(!CGeneral.lblTipo.getText().equals("Administrador")){
+                    CGeneral.menuConfig.setEnabled(false);
                 }
             }
             
@@ -198,9 +230,19 @@ public class Login extends javax.swing.JFrame {
             
         } catch (Exception e) {
         }
-        */
+     */
         
     }//GEN-LAST:event_btnIniciarActionPerformed
+
+    private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
+        // TODO add your handling code here:
+        requestFocus();
+    }//GEN-LAST:event_txtUsuarioActionPerformed
+
+    private void txtContraseñaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContraseñaActionPerformed
+        // TODO add your handling code here:
+        requestFocus();
+    }//GEN-LAST:event_txtContraseñaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -246,12 +288,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tablaListado;
-    private javax.swing.JTextField txtContraseña;
+    private javax.swing.JPasswordField txtContraseña;
     private javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }

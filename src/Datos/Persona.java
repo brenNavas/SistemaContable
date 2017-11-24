@@ -12,20 +12,21 @@ package Datos;
 public class Persona {
     
     
-    private int idPersona;
-    private String nombrePersona;
-    private String a_materno;
-    private String a_paterno;
-    private String num_dui;
-    private String direccion;
-    private String telefono;
-    private String email;
+    public Integer idPersona;
+    public String nombrePersona;
+    public String a_materno;
+    public String a_paterno;
+    public String num_dui;
+    public String direccion;
+    public String telefono;
+    public String email;
+    public Double sueldo;
    // private Empresa empresa;
 
     public Persona() {
     }
 
-    public Persona(int idPersona, String nombrePersona, String a_materno, String a_paterno, String num_dui, String direccion, String telefono, String email) {
+    public Persona(int idPersona, String nombrePersona, String a_materno, String a_paterno, String num_dui, String direccion, String telefono, String email, Double sueldo) {
         this.idPersona = idPersona;
         this.nombrePersona = nombrePersona;
         this.a_materno = a_materno;
@@ -34,6 +35,7 @@ public class Persona {
         this.direccion = direccion;
         this.telefono = telefono;
         this.email = email;
+        this.sueldo = sueldo;
     }
 
     public int getIdPersona() {
@@ -99,7 +101,15 @@ public class Persona {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Double getSueldo() {
+        return sueldo;
+    }
+
+    public void setSueldo(Double sueldo) {
+        this.sueldo = sueldo;
+    }
     
     
-    
+
 }

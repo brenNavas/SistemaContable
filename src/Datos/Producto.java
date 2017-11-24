@@ -11,19 +11,21 @@ package Datos;
  */
 public class Producto {
     
-    private Integer codigo;
-    private String nombre;
-    private String tipo;
-    private String uMedida;
+    public Integer codigo;
+    public String nombre;
+    public String tipo;
+    public String uMedida;
+    public String proceso;
 
     public Producto() {
     }
 
-    public Producto(Integer codigo, String nombre, String tipo, String uMedida) {
+    public Producto(Integer codigo, String nombre, String tipo, String uMedida, String proceso) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.tipo = tipo;
         this.uMedida = uMedida;
+        this.proceso = proceso;
     }
 
     public Integer getCodigo() {
@@ -57,8 +59,13 @@ public class Producto {
     public void setuMedida(String uMedida) {
         this.uMedida = uMedida;
     }
-    
-    
-    
-    
+
+    public String getProceso() {
+        return proceso;
+    }
+
+    public void setProceso(String proceso) {
+        this.proceso = proceso;
+    }
+
 }

@@ -5,32 +5,37 @@
  */
 package Datos;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Yeseliz
  */
 public class Cuentas {
     
-    private int idCuenta;
-    private long codigoCuenta;
-    private String nombreCuenta;
-    private String tipo;
-    private float saldo;
-    private long padre;
-    private float saldoDeudor;
-    private float saldoAcreedor;
+    public Integer idCuenta;
+    public Long codigoCuenta;
+    public String nombreCuenta;
+    public String tipo;
+    public Double saldo;
+    public Double saldoDeudor;
+    public Double saldoAcreedor;
+    Transacciones transaccion;
     
+
 
     public Cuentas() {
     }
 
-    public Cuentas(int idCuenta, long codigoCuenta, String nombreCuenta, String tipo, float saldo, long padre, float saldoDeudor, float saldoAcreedor) {
+    public Cuentas(long codigoCuenta, String nombreCuenta, String tipo, Double saldo, Double saldoDeudor, Double saldoAcreedor) {
         this.idCuenta = idCuenta;
         this.codigoCuenta = codigoCuenta;
         this.nombreCuenta = nombreCuenta;
         this.tipo = tipo;
         this.saldo = saldo;
-        this.padre = padre;
         this.saldoDeudor = saldoDeudor;
         this.saldoAcreedor = saldoAcreedor;
     }
@@ -43,28 +48,19 @@ public class Cuentas {
         this.idCuenta = idCuenta;
     }
 
-    public long getPadre() {
-        return padre;
-    }
-
-    public void setPadre(long padre) {
-        this.padre = padre;
-    }
-
-   
-    public float getSaldoDeudor() {
+    public Double getSaldoDeudor() {
         return saldoDeudor;
     }
 
-    public void setSaldoDeudor(float saldoDeudor) {
+    public void setSaldoDeudor(Double saldoDeudor) {
         this.saldoDeudor = saldoDeudor;
     }
 
-    public float getSaldoAcreedor() {
+    public Double getSaldoAcreedor() {
         return saldoAcreedor;
     }
 
-    public void setSaldoAcreedor(float saldoAcreedor) {
+    public void setSaldoAcreedor(Double saldoAcreedor) {
         this.saldoAcreedor = saldoAcreedor;
     }
 
@@ -93,13 +89,50 @@ public class Cuentas {
         this.tipo = tipo;
     }
 
-    public float getSaldo() {
+    public Double getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(float saldo) {
+    public void setSaldo(Double saldo) {
         this.saldo = saldo;
     }
     
+  public Transacciones crearTransaccion(){
+        transaccion  = new Transacciones();
+        
+        return transaccion;
+    }
+    
+    public void transaccionCuenta(Transacciones trans){
+        transaccion = trans;
+    }
+    
+      
+    
+   /*
+        public void acutalizarSaldo(Cuentas cuenta, Connection conexion2){
+        
+            try {
+            //String sentenciaSql3 = "INSERT INTO catalogo_cuentas(codigo,nombre,saldo)VALUES (?,?,?) "; 
+            String sentenciaSql3 = "UPDATE catalogo_cuentas SET saldo=? where codigo=?"; 
+            PreparedStatement preparedStatement = conexion2.prepareStatement(sentenciaSql3);
+            
+           // preparedStatement.setString(1,cuenta.nombre);
+            preparedStatement.setDouble(1, cuenta.getSaldo());
+            preparedStatement.setLong(2,cuenta.getCodigoCuenta());
+            preparedStatement.execute();
+            
+          /*  preparedStatement.setString(1, cuenta.codigo);
+            preparedStatement.setString(2,cuenta.nombre);
+            preparedStatement.setDouble(3,cuenta.saldo);
+            
+            preparedStatement.execute();
+           
+            
+    */
+
+  
     
 }
+
+

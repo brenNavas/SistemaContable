@@ -5,20 +5,129 @@
  */
 package Vistas;
 
+import Datos.Ajuste;
+import Datos.Transacciones;
+import Logica.AjusteTModel;
+import Logica.Conexion;
+import Logica.TransaccionTModel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+
 /**
  *
  * @author Rodriguez
  */
 public class ConsultarA extends javax.swing.JInternalFrame {
-
+public AjusteTModel ajusteesTModel = new AjusteTModel();
+private Conexion mysql = new Conexion();
+private Connection cn = mysql.conectar();
+private String sentenciaSql = "";
     /**
-     * Creates new form ConsultarA
+     * Creates new form ConsultarT
      */
     public ConsultarA() {
         initComponents();
         setResizable(false); //no se maximice la pantalla
-        setTitle("Consultar Ajuste"); //Título del Frame
+        setTitle("Consultar AJUSTE"); //Título del Frame
+        inicializarColumnas();
+        consultaInicial();
     }
+    
+     private void inicializarColumnas() {
+        TableColumnModel tColumnModel = new DefaultTableColumnModel();
+        for (int i = 0; i < 4; i++) {
+            TableColumn col = new TableColumn(i);
+            switch (i) {    
+                case 0:
+                    col.setHeaderValue("Id");
+                    break;
+                case 1:
+                    col.setHeaderValue("Fecha");
+                    break;
+                case 2:
+                    col.setHeaderValue("Descripción");
+                    break;
+                case 3:
+                    col.setHeaderValue("Monto");
+                   
+            }
+            tColumnModel.addColumn(col);
+        }
+        tablaConsultarT.setColumnModel(tColumnModel);
+    }
+    
+      private void consultaInicial() {
+        try {
+            sentenciaSql = "SELECT * FROM ajustes ORDER BY idAjuste asc";
+            Statement statement = this.cn.createStatement();
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+               Ajuste ajuste = new Ajuste();
+               ajuste.idAjuste=resultado.getInt("idAjuste");
+               ajuste.fecha= resultado.getString("fecha");
+               ajuste.descripcion = resultado.getString("descripcion");
+               ajuste.monto = resultado.getDouble("monto");
+               ajuste.tipo = resultado.getString("tipo");
+                         
+             this.ajusteesTModel.ajustes.add(ajuste);
+            }
+            tablaConsultarT.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar los ajustees de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+    
+      private void UpdateJTable() {
+        ajusteesTModel.ajustes.clear();
+        try {
+            PreparedStatement statement = null;
+            sentenciaSql = "SELECT * FROM ajustes ORDER BY idAjuste asc";
+            statement = this.cn.prepareStatement(sentenciaSql);
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+               Ajuste ajuste = new Ajuste();
+               ajuste.idAjuste=resultado.getInt("idAjuste");
+               ajuste.fecha= resultado.getString("fecha");
+               ajuste.descripcion = resultado.getString("descripcion");
+               ajuste.monto = resultado.getDouble("monto");
+               ajuste.tipo = resultado.getString("tipo");
+               
+                         
+             this.ajusteesTModel.ajustes.add(ajuste);
+            }
+            tablaConsultarT.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar los Ajustes de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+
+     
+    //método de filtro de datos
+    private TableRowSorter tr;
+    
+    public void filtro(){
+        tr.setRowFilter(RowFilter.regexFilter(txtBuscar.getText(),1,2));
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,78 +141,135 @@ public class ConsultarA extends javax.swing.JInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tablaAjuste = new javax.swing.JTable();
+        tablaConsultarT = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         txtBuscar = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setClosable(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setIconifiable(true);
+        setFrameIcon(null);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102), 7));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(204, 204, 204));
+        jLabel2.setForeground(new java.awt.Color(255, 255, 0));
         jLabel2.setText("CONSULTAR AJUSTE");
 
-        tablaAjuste.setBackground(new java.awt.Color(204, 204, 204));
-        tablaAjuste.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "CÓDIGO", "DESCRIPCIÓN", "SALDO", "FECHA"
-            }
-        ));
-        jScrollPane1.setViewportView(tablaAjuste);
+        tablaConsultarT.setBackground(new java.awt.Color(204, 204, 204));
+        tablaConsultarT.setModel(ajusteesTModel);
+        jScrollPane1.setViewportView(tablaConsultarT);
 
-        jLabel3.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel3.setForeground(new java.awt.Color(102, 0, 102));
         jLabel3.setText("Digite el código o la descripción del ajuste:");
+
+        txtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyTyped(evt);
+            }
+        });
+
+        jButton1.setText("Eliminar Ajuste");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(27, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel3)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
-                            .addComponent(txtBuscar))
-                        .addGap(21, 21, 21))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(142, 142, 142))))
+                .addGap(39, 39, 39)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                    .addComponent(txtBuscar))
+                .addGap(0, 36, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(271, 271, 271)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(191, 191, 191))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel2)
-                .addGap(32, 32, 32)
+                .addGap(29, 29, 29)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addGap(31, 31, 31)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, -1, 400));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 630, 520));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 540, 560));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 710, 580));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBuscarActionPerformed
+
+    private void txtBuscarKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyTyped
+        // TODO add your handling code here:
+         // filtro de datos en la tabla
+        txtBuscar.addKeyListener(new KeyAdapter (){
+            public void keyReleased(final KeyEvent e){
+                String cadena = (txtBuscar.getText()).toUpperCase();
+                txtBuscar.setText(cadena);
+                repaint();
+                filtro();
+            }
+      });
+                tr= new TableRowSorter(tablaConsultarT.getModel());
+                tablaConsultarT.setRowSorter(tr); 
+    }//GEN-LAST:event_txtBuscarKeyTyped
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         int[] indices = tablaConsultarT.getSelectedRows();
+
+         List<Ajuste> aEliminar = new ArrayList<Ajuste>();
+        
+        for (int i : indices) {
+            Ajuste ajuste = ajusteesTModel.ajustes.get(i);
+            String sentenciaSql = "DELETE FROM ajustes WHERE idAjuste = ?";
+            aEliminar.add(ajuste);
+            try {
+                PreparedStatement prepStat = cn.prepareStatement(sentenciaSql);
+                prepStat.setInt(1, ajuste.idAjuste);
+                prepStat.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Elimino correctamente "+ajuste.idAjuste );
+                UpdateJTable();
+            } catch (SQLException ex) {
+                Logger.getLogger(Cuenta.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        tablaConsultarT.repaint();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -131,6 +297,9 @@ public class ConsultarA extends javax.swing.JInternalFrame {
             java.util.logging.Logger.getLogger(ConsultarA.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -141,12 +310,13 @@ public class ConsultarA extends javax.swing.JInternalFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tablaAjuste;
+    private javax.swing.JTable tablaConsultarT;
     private javax.swing.JTextField txtBuscar;
     // End of variables declaration//GEN-END:variables
 }

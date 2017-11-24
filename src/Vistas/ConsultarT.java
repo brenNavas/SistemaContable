@@ -5,12 +5,37 @@
  */
 package Vistas;
 
+import Datos.Transacciones;
+import Logica.Conexion;
+import Logica.TransaccionTModel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+
 /**
  *
  * @author Rodriguez
  */
 public class ConsultarT extends javax.swing.JInternalFrame {
-
+public TransaccionTModel transaccionesTModel = new TransaccionTModel();
+private Conexion mysql = new Conexion();
+private Connection cn = mysql.conectar();
+private String sentenciaSql = "";
     /**
      * Creates new form ConsultarT
      */
@@ -18,7 +43,89 @@ public class ConsultarT extends javax.swing.JInternalFrame {
         initComponents();
         setResizable(false); //no se maximice la pantalla
         setTitle("Consultar Transacción"); //Título del Frame
+        inicializarColumnas();
+        consultaInicial();
     }
+    
+     private void inicializarColumnas() {
+        TableColumnModel tColumnModel = new DefaultTableColumnModel();
+        for (int i = 0; i < 4; i++) {
+            TableColumn col = new TableColumn(i);
+            switch (i) {
+                case 0:
+                    col.setHeaderValue("Id");
+                    break;
+                case 1:
+                    col.setHeaderValue("Fecha");
+                    break;
+                case 2:
+                    col.setHeaderValue("Descripción");
+                    break;
+                case 3:
+                    col.setHeaderValue("Monto");
+                   
+            }
+            tColumnModel.addColumn(col);
+        }
+        tablaConsultarT.setColumnModel(tColumnModel);
+    }
+    
+      private void consultaInicial() {
+        try {
+            sentenciaSql = "SELECT * FROM nuevatransaccion ORDER BY codigo asc";
+            Statement statement = this.cn.createStatement();
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+               Transacciones transaccion = new Transacciones();
+               transaccion.idTransaccion=resultado.getInt("codigo");
+               transaccion.fecha= resultado.getString("fecha");
+               transaccion.descripcion = resultado.getString("descripcion");
+               transaccion.monto = resultado.getDouble("monto");
+               transaccion.tipo = resultado.getString("tipo");
+                         
+             this.transaccionesTModel.transacciones.add(transaccion);
+            }
+            tablaConsultarT.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar los transacciones de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+    
+      private void UpdateJTable() {
+        transaccionesTModel.transacciones.clear();
+        try {
+            PreparedStatement statement = null;
+            sentenciaSql = "SELECT * FROM nuevatransaccion ORDER BY codigo asc";
+            statement = this.cn.prepareStatement(sentenciaSql);
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+               Transacciones transaccion = new Transacciones();
+               transaccion.idTransaccion=resultado.getInt("codigo");
+            //   transaccion.fecha= resultado.getString("fecha");
+               transaccion.descripcion = resultado.getString("descripcion");
+               transaccion.monto = resultado.getDouble("monto");
+               transaccion.tipo = resultado.getString("tipo");
+               
+                         
+             this.transaccionesTModel.transacciones.add(transaccion);
+            }
+            tablaConsultarT.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar las Transacciones de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+
+     
+    //método de filtro de datos
+    private TableRowSorter tr;
+    
+    public void filtro(){
+        tr.setRowFilter(RowFilter.regexFilter(txtBuscar.getText(),1,2));
+    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -35,75 +142,132 @@ public class ConsultarT extends javax.swing.JInternalFrame {
         tablaConsultarT = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         txtBuscar = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setClosable(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setIconifiable(true);
+        setFrameIcon(null);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102), 7));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(204, 204, 204));
+        jLabel2.setForeground(new java.awt.Color(255, 255, 51));
         jLabel2.setText("CONSULTAR TRANSACCIÓN");
 
         tablaConsultarT.setBackground(new java.awt.Color(204, 204, 204));
-        tablaConsultarT.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "CÓDIGO", "DESCRIPCIÓN", "SALDO", "FECHA"
-            }
-        ));
+        tablaConsultarT.setModel(transaccionesTModel);
         jScrollPane1.setViewportView(tablaConsultarT);
 
-        jLabel3.setForeground(new java.awt.Color(0, 153, 153));
+        jLabel3.setForeground(new java.awt.Color(102, 0, 102));
         jLabel3.setText("Digite el código o la descripción de la transacción:");
+
+        txtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyTyped(evt);
+            }
+        });
+
+        jButton1.setText("Eliminar Transacción");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(27, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel3)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
-                            .addComponent(txtBuscar))
-                        .addGap(21, 21, 21))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(124, 124, 124))))
+                .addGap(39, 39, 39)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                    .addComponent(txtBuscar))
+                .addGap(0, 36, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addGap(215, 215, 215))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(271, 271, 271)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addGap(29, 29, 29)
                 .addComponent(jLabel2)
-                .addGap(33, 33, 33)
+                .addGap(36, 36, 36)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 58, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(31, 31, 31)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, -1, 360));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 630, 520));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 510));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 710, 580));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBuscarActionPerformed
+
+    private void txtBuscarKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyTyped
+        // TODO add your handling code here:
+         // filtro de datos en la tabla
+        txtBuscar.addKeyListener(new KeyAdapter (){
+            public void keyReleased(final KeyEvent e){
+                String cadena = (txtBuscar.getText()).toUpperCase();
+                txtBuscar.setText(cadena);
+                repaint();
+                filtro();
+            }
+      });
+                tr= new TableRowSorter(tablaConsultarT.getModel());
+                tablaConsultarT.setRowSorter(tr); 
+    }//GEN-LAST:event_txtBuscarKeyTyped
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         int[] indices = tablaConsultarT.getSelectedRows();
+
+         List<Transacciones> aEliminar = new ArrayList<Transacciones>();
+        
+        for (int i : indices) {
+            Transacciones transaccion = transaccionesTModel.transacciones.get(i);
+            String sentenciaSql = "DELETE FROM nuevatransaccion WHERE codigo = ?";
+            aEliminar.add(transaccion);
+            try {
+                PreparedStatement prepStat = cn.prepareStatement(sentenciaSql);
+                prepStat.setInt(1, transaccion.idTransaccion);
+                prepStat.executeUpdate();
+                JOptionPane.showMessageDialog(this, "Elimino correctamente " + transaccion.idTransaccion);
+                UpdateJTable();
+            } catch (SQLException ex) {
+                Logger.getLogger(Cuenta.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        tablaConsultarT.repaint();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -141,6 +305,7 @@ public class ConsultarT extends javax.swing.JInternalFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

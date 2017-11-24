@@ -12,16 +12,16 @@ package Datos;
 public class Trabajador extends Persona {
     
     public String nombreUsuario;
-    public String contraseña;
+    public String password;
     public String cargo;
     public String tipo_acceso;
 
     public Trabajador() {
     }
 
-    public Trabajador(String nombreUsuario, String contraseña, String cargo, String tipo_acceso) {
+    public Trabajador(String nombreUsuario, String password, String cargo, String tipo_acceso) {
         this.nombreUsuario = nombreUsuario;
-        this.contraseña = contraseña;
+        this.password = password;
         this.cargo = cargo;
         this.tipo_acceso = tipo_acceso;
     }
@@ -34,12 +34,12 @@ public class Trabajador extends Persona {
         this.nombreUsuario = nombreUsuario;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getPassword() {
+        return password;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getCargo() {
@@ -57,10 +57,8 @@ public class Trabajador extends Persona {
     public void setTipo_acceso(String tipo_acceso) {
         this.tipo_acceso = tipo_acceso;
     }
-    
+
     
     
     
 }
-
-    

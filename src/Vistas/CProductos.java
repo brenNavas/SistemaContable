@@ -10,41 +10,88 @@ package Vistas;
  * @author Yeseliz
  */
 import Datos.Producto;
-import Logica.fProductos;
+import Logica.Conexion;
+import Logica.productoTableModel;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 public class CProductos extends javax.swing.JInternalFrame {
-
+public productoTableModel productoTModel = new productoTableModel();
+private Conexion mysql = new Conexion();
+private Connection cn = mysql.conectar();
+private String sentenciaSql = "";
     /**
      * Creates new form Catalogo
      */
     public CProductos() {
         initComponents();
         setResizable(false); //no se maximice la pantalla
-        setTitle("Articulos"); //Título del Frame
-        mostrar("");
-    }
-
-
-    void mostrar(String buscar) { //mostrar datos en la tabla
-        try {
-            DefaultTableModel modelo;
-            fProductos a = new fProductos();
-            modelo = a.mostrar(buscar);
-
-            tablaArticulos.setModel(modelo);
+        setTitle("Consultar Productos"); //Título del Frame
+        inicializarColumnas();
+        consultaInicial();
+     
        
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(rootPane, e);
-        }
     }
     
+     private void inicializarColumnas() {
+        TableColumnModel tColumnModel = new DefaultTableColumnModel();
+        for (int i = 0; i < 4; i++) {
+            TableColumn col = new TableColumn(i);
+            switch (i) {
+                case 0:
+                    col.setHeaderValue("Código");
+                    break;
+                case 1:
+                    col.setHeaderValue("Nombre");
+                    break;
+                case 2:
+                    col.setHeaderValue("Tipo");
+                    break;
+                case 3:
+                    col.setHeaderValue("Unidad de Medida");
+              
+            }
+            tColumnModel.addColumn(col);
+        }
+        tablaProducto.setColumnModel(tColumnModel);
+    }
+    
+
+
+    private void consultaInicial() {
+        try {
+            sentenciaSql = "SELECT * FROM producto ORDER BY codigoProducto asc";
+            Statement statement = this.cn.createStatement();
+            ResultSet resultado = statement.executeQuery(sentenciaSql);
+            while (resultado.next()) {
+                Producto producto = new Producto();
+               producto.codigo = resultado.getInt("codigoProducto");
+                producto.nombre = resultado.getString("nombreProducto");
+                producto.tipo = resultado.getString("tipoProducto");
+                producto.uMedida = resultado.getString("unidadMedida");
+                       
+             this.productoTModel.productos.add(producto);
+            }
+            tablaProducto.repaint();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al recuperar los productos de la base de datos");
+            ex.printStackTrace();
+        }
+    }
+   
       //método de filtro de datos
     private TableRowSorter tr;
     
@@ -69,7 +116,7 @@ public class CProductos extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tablaArticulos = new javax.swing.JTable();
+        tablaProducto = new javax.swing.JTable();
         txtBuscar = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -77,26 +124,17 @@ public class CProductos extends javax.swing.JInternalFrame {
         setClosable(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setIconifiable(true);
+        setFrameIcon(null);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(0, 102, 102));
+        jPanel1.setBackground(new java.awt.Color(102, 0, 102));
 
-        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
-        tablaArticulos.setBackground(new java.awt.Color(204, 204, 204));
-        tablaArticulos.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(tablaArticulos);
+        tablaProducto.setBackground(new java.awt.Color(204, 204, 204));
+        tablaProducto.setModel(productoTModel);
+        jScrollPane1.setViewportView(tablaProducto);
 
         txtBuscar.setBackground(new java.awt.Color(204, 204, 204));
         txtBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -110,8 +148,8 @@ public class CProductos extends javax.swing.JInternalFrame {
             }
         });
 
-        jLabel3.setForeground(new java.awt.Color(0, 153, 153));
-        jLabel3.setText("Digite el código o nombre de la cuenta que desea buscar:");
+        jLabel3.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel3.setText("Digite el código del producto que desea buscar:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -128,13 +166,13 @@ public class CProductos extends javax.swing.JInternalFrame {
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(31, Short.MAX_VALUE)
+                .addGap(37, 37, 37)
                 .addComponent(jLabel3)
                 .addGap(18, 18, 18)
                 .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                .addGap(27, 27, 27)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -151,13 +189,13 @@ public class CProductos extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 660, 320));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 660, 460));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 410));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 730, 550));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -176,8 +214,8 @@ public class CProductos extends javax.swing.JInternalFrame {
                 filtro();
             }
       });
-                tr= new TableRowSorter(tablaArticulos.getModel());
-                tablaArticulos.setRowSorter(tr); 
+                tr= new TableRowSorter(tablaProducto.getModel());
+                tablaProducto.setRowSorter(tr); 
     }//GEN-LAST:event_txtBuscarKeyTyped
 
     /**
@@ -224,7 +262,7 @@ public class CProductos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tablaArticulos;
+    private javax.swing.JTable tablaProducto;
     private javax.swing.JTextField txtBuscar;
     // End of variables declaration//GEN-END:variables
 }

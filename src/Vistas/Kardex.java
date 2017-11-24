@@ -5,6 +5,16 @@
  */
 package Vistas;
 
+import Logica.Conexion;
+import Logica.kardexT;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Yeseliz
@@ -17,8 +27,47 @@ public class Kardex extends javax.swing.JInternalFrame{
     public Kardex() {
         initComponents();
         setResizable(false); //no se maximice la pantalla
-        setTitle("Kardex"); //Título del Frame
+        setTitle("Kardex");
+        mostrar("");
     }
+    
+    Connection con;
+    PreparedStatement preparo;
+    ResultSet resultado;
+    
+    
+    
+    
+    
+     void mostrar(String cp) { //mostrar datos en la tabla
+        try {
+            DefaultTableModel modelo;
+            kardexT cta = new kardexT();
+            modelo = cta.mostrar(cp);
+
+            tablaK.setModel(modelo);
+            
+           
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e);
+        }
+    }
+     
+     void LimpiarCajas()
+     {
+         txtCantProd.setText("");
+         txtCodProd.setText("");
+         txtCodigoKardex.setText("");
+         txtFecha.setText("");
+         txtPrecioProd.setText("");
+     }
+     
+    
+    
+    
+    
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -29,14 +78,472 @@ public class Kardex extends javax.swing.JInternalFrame{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        txtCodProd = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtCantProd = new javax.swing.JTextField();
+        btnAgregar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        txtFecha = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtPrecioProd = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        chek_entrada = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tablaK = new javax.swing.JTable();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        txtCodigoKardex = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 400));
+        setClosable(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setIconifiable(true);
+        setMaximumSize(new java.awt.Dimension(1235, 571));
+        setMinimumSize(new java.awt.Dimension(1235, 571));
+        setName(""); // NOI18N
+        setPreferredSize(new java.awt.Dimension(1235, 571));
+        getContentPane().setLayout(null);
+
+        jPanel1.setBackground(new java.awt.Color(102, 0, 102));
+
+        jPanel2.setBackground(new java.awt.Color(153, 153, 153));
+        jPanel2.setLayout(null);
+
+        jLabel1.setFont(new java.awt.Font("Open Sans", 0, 10)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel1.setText("Codigo Producto");
+        jPanel2.add(jLabel1);
+        jLabel1.setBounds(10, 40, 80, 14);
+        jPanel2.add(txtCodProd);
+        txtCodProd.setBounds(100, 30, 122, 20);
+
+        jLabel2.setFont(new java.awt.Font("Open Sans", 0, 10)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel2.setText("Cantidad de Producto");
+        jPanel2.add(jLabel2);
+        jLabel2.setBounds(10, 150, 120, 14);
+        jPanel2.add(txtCantProd);
+        txtCantProd.setBounds(150, 150, 74, 20);
+
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnAgregar);
+        btnAgregar.setBounds(20, 290, 190, 23);
+
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnEliminar);
+        btnEliminar.setBounds(20, 70, 200, 23);
+
+        jLabel3.setFont(new java.awt.Font("Open Sans", 0, 10)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel3.setText("Precio del Producto");
+        jPanel2.add(jLabel3);
+        jLabel3.setBounds(20, 200, 95, 14);
+        jPanel2.add(txtFecha);
+        txtFecha.setBounds(150, 230, 70, 20);
+
+        jLabel10.setFont(new java.awt.Font("Open Sans", 0, 10)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel10.setText("Fecha");
+        jPanel2.add(jLabel10);
+        jLabel10.setBounds(80, 240, 30, 14);
+        jPanel2.add(txtPrecioProd);
+        txtPrecioProd.setBounds(150, 190, 70, 20);
+
+        jLabel13.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel13.setText("            ELIMINAR TRANSACCION");
+        jPanel2.add(jLabel13);
+        jLabel13.setBounds(10, 10, 210, 14);
+
+        jLabel14.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel14.setText("AGREGAR TRANSACCION");
+        jPanel2.add(jLabel14);
+        jLabel14.setBounds(40, 120, 160, 20);
+
+        chek_entrada.setForeground(new java.awt.Color(254, 254, 254));
+        chek_entrada.setText("¿ Es entrada ?");
+        jPanel2.add(chek_entrada);
+        chek_entrada.setBounds(20, 260, 200, 23);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        getContentPane().add(jPanel1);
+        jPanel1.setBounds(10, 180, 260, 350);
+
+        jPanel3.setBackground(new java.awt.Color(153, 0, 102));
+
+        tablaK.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "FECHA", "CANTIDAD", "CU", "TOTAL", "CANTIDAD", "CU", "TOTAL", "CANTIDAD", "CU", "TOTAL"
+            }
+        ));
+        jScrollPane1.setViewportView(tablaK);
+
+        jLabel4.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel4.setText("                                  SALIDA");
+
+        jLabel5.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel5.setText("                                     ENTRADA");
+
+        jLabel6.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel6.setText("                          TOTAL");
+
+        jLabel7.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel7.setText("METODO COSTO PROMEDIO");
+
+        jLabel8.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel8.setText("KARDEX");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addGap(70, 70, 70)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(44, 44, 44)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(70, 70, 70)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 861, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(172, 172, 172)
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 5, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(22, 22, 22)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+                    .addGap(507, 507, 507)))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel6))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(22, 22, 22)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                    .addGap(409, 409, 409)))
+        );
+
+        getContentPane().add(jPanel3);
+        jPanel3.setBounds(290, 10, 890, 470);
+
+        jPanel4.setBackground(new java.awt.Color(102, 0, 102));
+
+        jPanel5.setBackground(new java.awt.Color(153, 153, 153));
+
+        jLabel9.setForeground(new java.awt.Color(102, 0, 102));
+        jLabel9.setText("CODIGO KARDEX");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(txtCodigoKardex, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtCodigoKardex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(66, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        getContentPane().add(jPanel4);
+        jPanel4.setBounds(10, 10, 270, 160);
+
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.jpg"))); // NOI18N
+        jLabel11.setText("jLabel11");
+        getContentPane().add(jLabel11);
+        jLabel11.setBounds(0, 0, 1220, 540);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        // TODO add your handling code here:
+        boolean entrada = false;
+        if(chek_entrada.isSelected())
+            {
+                 entrada = true;   
+             }
+        
+        
+        
+        
+       
+        int canT=0,canA,canti,k=0;
+        Double cuT = 0.0,cuA,cu;
+        Double totT = 0.0,totA,CostoPromedio=0.0,tot,aux=1.0;
+        
+        
+               String sentenciaSql = "SELECT * FROM kardex2 ";//SENTENCIA SQL
+               try {
+                   con=Conexion.getConection();
+                    Statement st= con.createStatement();//CONEXION
+                    ResultSet  rs = st.executeQuery(sentenciaSql);//LLENA A rs CON LOS RESULTADOS DE LA CONSULTA
+                       
+       
+           while(rs.next()){//recore el kardex hasta llegar al ultimo valor total para calcular el CP 
+                aux=totT; 
+                
+                cuT=Double.parseDouble(rs.getString("costoUt"));
+                canT=Integer.parseInt(rs.getString("cantidadT"));
+                totT=cuT*canT;
+                k++;
+
+              }
+                
+                con.close();   
+           
+                }
+               
+               
+               catch(Exception e){
+                JOptionPane.showMessageDialog(null, "error costoProm"+e);
+                
+             }
+               
+               //VALIDO LOS CAMPOS PARA QUE NO ME DE ERROR AL INSERTAR EN LA BASE
+               if(txtPrecioProd.getText().equals("")||Double.parseDouble(txtPrecioProd.getText())<0)
+               {
+                   cuA=0.00;
+                   txtPrecioProd.setText("0.00");
+               }
+               else
+                   cuA=Double.parseDouble(txtPrecioProd.getText());
+               if(txtCantProd.getText().equals("")||Integer.parseInt(txtCantProd.getText())<0)
+               {
+                   canA=0;
+                   txtCantProd.setText("0");
+               }
+               else
+                   canA=Integer.parseInt(txtCantProd.getText());
+               
+               //CALCULO EL TOTAL DE LA TRANSACCION ACTUAL
+               totA=cuA*canA;//OBTENGO EL TOTAL ACTUAL
+               
+               if(txtFecha.getText().equals(""))
+               {
+                   JOptionPane.showConfirmDialog(null, "INGRESE UNA FECHA");
+               }
+               ///////////////////////////////////////////////////////////////////////////////////
+               
+               
+               
+              
+               
+               
+       //EMPIEZO A HACER EL INSERT
+        try {
+           con = Conexion.getConection();//INSERT INTO `persona` (`id`, `clave`, `nombre`, `telefono`, `fecha`) VALUES (NULL, '2345', 'MARIA', '77645376', '2016-10-2');
+           preparo = con.prepareStatement("INSERT INTO kardex2 (codigoKardex,fecha,cantidadE,costoUe,cantidadS,costoUs,cantidadT,costoUt) VALUES (?,?,?,?,?,?,?,?)");
+           preparo.setString(1,null);
+           preparo.setString(2,txtFecha.getText());
+
+           
+           if(entrada == true)//SI LA CASILLA ESTA SELECCIONADA ES POR QUE ES ENTRADA
+           {
+              
+               //ENTRADA DE MERCADERIA
+              
+               cu=Double.parseDouble(txtPrecioProd.getText());//SACO EL C.U INGRESADO POR EL USUARI0
+               canti=Integer.parseInt(txtCantProd.getText());//SACO LA CANTIDAD INGRESADA POR EL USUARIO
+               
+               canT=canT+canti;//CALCULO EL TOTAL ACTUAL
+               
+               
+               if(canT==0)//SI LA CANTIDAD ES CERO EL COSTO PROMEDIO ES EL MISMO DE LA TRANSACCION ACTUAL
+               {
+                 CostoPromedio=cuA;  
+               }
+               else
+                   CostoPromedio=(totT+(cu*canti))/canT;//DE NO SER ASI PROCEDO A CALCULARLO
+        
+               preparo.setInt(3,canti);
+               preparo.setDouble(4,cu);
+                        
+               preparo.setInt(5,0);//DEJO ESTOS VALORES A CERO SON LOS VALORES DE LA SALIDA
+               preparo.setDouble(6,0.0);
+
+               preparo.setInt(7,canT);
+               preparo.setDouble(8,CostoPromedio);
+             
+               
+               
+           }
+           
+         
+           else    
+           {
+            //SALIDA DE MERCADERIA
+               
+               
+              
+               canti=Integer.parseInt(txtCantProd.getText());
+               
+               if(canT==0)
+               {
+                 CostoPromedio=cuA;  
+               }
+               else
+                   CostoPromedio=(totT)/canT;
+               
+               canT=canT-canti;
+               
+               
+               preparo.setInt(3,0);//SON LOS VALORES DE ENTRADA LES PONGO CERO
+               preparo.setDouble(4,0.0);
+               
+               preparo.setInt(5,Integer.parseInt(txtCantProd.getText()));
+               preparo.setDouble(6,CostoPromedio);
+               
+               preparo.setInt(7,canT);
+               preparo.setDouble(8,CostoPromedio);
+               
+           }
+           
+           
+          
+           int res = preparo.executeUpdate();
+           if(res>0)
+           {
+               //JOptionPane.showMessageDialog(null,"Guardado");
+               
+               mostrar("");
+               LimpiarCajas();
+               
+               
+           }
+           else
+           {
+           JOptionPane.showMessageDialog(null,"ERROR AL Guardadar");    
+           }
+           
+           con.close();
+           
+        }
+        
+        catch (Exception e) {
+        }    
+     
+      
+      
+        
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        // TODO add your handling code here:
+         try {
+           con = Conexion.getConection();
+           preparo = con.prepareStatement("delete from kardex2 where codigoKardex=?");
+           preparo.setString(1,txtCodProd.getText());
+           
+           
+           int res = preparo.executeUpdate();
+           if(res>0)
+           {
+              
+               LimpiarCajas();
+               mostrar("");
+           }
+           else
+           {
+               JOptionPane.showMessageDialog(null,"ERROR AL ELIMINAR");
+           }
+           
+           con.close();
+           
+        }
+        
+        catch (Exception e) {
+        }
+        
+        
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -64,6 +571,7 @@ public class Kardex extends javax.swing.JInternalFrame{
             java.util.logging.Logger.getLogger(Kardex.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -74,6 +582,33 @@ public class Kardex extends javax.swing.JInternalFrame{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JCheckBox chek_entrada;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tablaK;
+    private javax.swing.JTextField txtCantProd;
+    private javax.swing.JTextField txtCodProd;
+    private javax.swing.JTextField txtCodigoKardex;
+    private javax.swing.JTextField txtFecha;
+    private javax.swing.JTextField txtPrecioProd;
     // End of variables declaration//GEN-END:variables
 }
